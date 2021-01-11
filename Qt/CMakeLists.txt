@@ -20,13 +20,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../CommonSource ${CMAKE_CURRENT_BIN
 
 # add trainData to project, so we can use it in qrc
 execute_process(
-    COMMAND ${CMAKE_COMMAND} -E remove_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/trainData
-    )
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/../assets/TrainData
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/trainData
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_SOURCE_DIR}/trainData
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../assets/TrainData ${CMAKE_CURRENT_SOURCE_DIR}/resources/trainData
     )
 
 set(HEADERS
