@@ -1,0 +1,3 @@
+[submodule "OpenCV"]
+	path = OpenCV
+	url = git@github.com:StephanWidor/BuildOpenCV.git

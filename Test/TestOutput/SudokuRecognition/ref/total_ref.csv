@@ -1,0 +1,4 @@
+path;duration;numRecognized;digitDiff;recognizeSuccess;digitSuccess;numResults
+pictures;6.427;86;637;0.895833;0.908556;96
+videos;43.691;30;331;0.882353;0.863786;34
+total;50.118;116;968;0.892308;0.896977;130

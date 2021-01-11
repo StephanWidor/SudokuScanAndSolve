@@ -1,0 +1,472 @@
+# the default style if something is not configured
+BasedOnStyle: WebKit
+
+# The extra indent or outdent of access modifiers, e.g. public:.
+# class X {
+# public: // <- this one!
+#     bleep;
+# }
+AccessModifierOffset: -4
+
+# horizontally aligns arguments after an open bracket, for very long lines
+# someLongFunction(argument1,
+#                  argument2);
+AlignAfterOpenBracket: Align
+
+# aligns consecutive assignments
+# int aaaa = 12;
+# int b    = 23;
+# int ccc  = 23;
+AlignConsecutiveAssignments: false
+
+# aligns consecutive declarations
+# int         aaaa = 12;
+# float       b = 23;
+# std::string ccc = 23;
+AlignConsecutiveDeclarations: false
+
+# Options for aligning backslashes in escaped newlines
+# #define A   \
+#   int aaaa; \
+#   int b;    \
+#   int dddddddddd;
+AlignEscapedNewlines: Left
+
+# Align operands of very long lines
+# int aaa = bbbbbbbbbbbbbbb +
+#           ccccccccccccccc;
+AlignOperands: true
+
+# aligns trailing comments
+# true:                                   false:
+# int a;     // My comment a      vs.     int a; // My comment a
+# int b = 2; // comment  b                int b = 2; // comment about b
+AlignTrailingComments: false
+
+# If the function declaration doesn’t fit on a line, allow putting all parameters of a function declaration onto the next line
+# true:
+# void myFunction(
+#     int a, int b, int c, int d, int e);
+#
+# false:
+# void myFunction(int a,
+#                 int b,
+#                 int c,
+#                 int d,
+#                 int e);
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Allows contracting simple braced statements to a single line
+# if (a) { return; }
+AllowShortBlocksOnASingleLine: false
+
+# short case labels will be contracted to a single line
+# true:                                   false:
+# switch (a) {                    vs.     switch (a) {
+# case 1: x = 1; break;                   case 1:
+# case 2: return;                           x = 1;
+# }                                         break;
+#                                         case 2:
+#                                           return;
+#                                         }
+AllowShortCaseLabelsOnASingleLine: false
+
+# class Foo {
+#   void f() { foo(); } <- yes
+# };
+# void f() {
+#   foo(); <- don't put on one line
+# }
+# void f() {
+# }
+AllowShortFunctionsOnASingleLine: InlineOnly
+
+# If true allow
+# if (a) return;
+AllowShortIfStatementsOnASingleLine: false
+
+# If true allow
+# while (true) continue;
+AllowShortLoopsOnASingleLine: false
+
+# The function declaration return type breaking style to use
+# I.e. do you want
+# int
+# FunctionName();
+AlwaysBreakAfterReturnType: None
+
+# true:                                  false:
+# aaaa =                         vs.     aaaa = "bbbb"
+#     "bbbb"                                    "cccc";
+#     "cccc";
+AlwaysBreakBeforeMultilineStrings: false
+
+
+# template <typename T> // <- break here
+# T foo() {
+# }
+# template <typename T> // <- break here
+# T foo(int aaaaaaaaaaaaaaaaaaaaa,
+#       int bbbbbbbbbbbbbbbbbbbbb) {
+# }
+AlwaysBreakTemplateDeclarations: Yes
+
+# Bin pack arguments of a function
+# true:
+# void f() {
+#   f(aaaaaaaaaaaaaaaaaaaa, aaaaaaaaaaaaaaaaaaaa,
+#     aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa);
+# }
+#
+# false:
+# void f() {
+#   f(aaaaaaaaaaaaaaaaaaaa,
+#     aaaaaaaaaaaaaaaaaaaa,
+#     aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa);
+# }
+BinPackArguments: true
+
+# Bin pack parameters
+# true:
+# void f(int aaaaaaaaaaaaaaaaaaaa, int aaaaaaaaaaaaaaaaaaaa,
+#        int aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) {}
+#
+# false:
+# void f(int aaaaaaaaaaaaaaaaaaaa,
+#        int aaaaaaaaaaaaaaaaaaaa,
+#        int aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) {}
+BinPackParameters: true
+
+# Breaking and braces, ... either you choose a defined style, or define it as custom
+BreakBeforeBraces: Custom
+
+# Custom breaking...
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+# Break after operators for very long lines
+# LooooooooooongType loooooooooooooooooooooongVariable =
+#     someLooooooooooooooooongFunction();
+#
+# bool value = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa +
+#                      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ==
+#                  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa &&
+#              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa >
+#                  ccccccccccccccccccccccccccccccccccccccccc;
+BreakBeforeBinaryOperators: None
+
+# true:
+# veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongDescription
+#     ? firstValue
+#     : SecondValueVeryVeryVeryVeryLong;
+#
+# false:
+# veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongDescription ?
+#     firstValue :
+#     SecondValueVeryVeryVeryVeryLong;
+BreakBeforeTernaryOperators: false
+
+# Constructor initializers style to use
+# Constructor() :
+#    initializer1(),
+#    initializer2()
+BreakConstructorInitializers: BeforeComma
+
+# class Foo :
+#     Base1,
+#     Base2
+# {};
+BreakInheritanceList: AfterColon
+
+# Allow breaking of string literals when formatting?
+BreakStringLiterals: false
+
+# Is there a column limit?
+# We limit here because it simplifies side-by-side comparison of lines
+# Originally this is 80 which is rather short for widescreen monitors
+ColumnLimit: 120
+
+# A regular expression that describes comments with special meaning,
+# which should not be split into lines or otherwise changed.
+# Not yet filled in...
+CommentPragmas: ""
+
+# Compact namespace declarations or not?
+# true:
+# namespace Foo { namespace Bar {
+# }}
+#
+# false:
+# namespace Foo {
+# namespace Bar {
+# }
+# }
+CompactNamespaces: false
+
+# Constructor initialisers and long lines...
+#
+# true:
+# SomeClass::Constructor()
+#     : aaaaaaaa(aaaaaaaa), aaaaaaaa(aaaaaaaa), aaaaaaaa(aaaaaaaaaaaaaaaaaaaaaaaaa) {
+#   return 0;
+# }
+#
+# false:
+# SomeClass::Constructor()
+#     : aaaaaaaa(aaaaaaaa), aaaaaaaa(aaaaaaaa),
+#       aaaaaaaa(aaaaaaaaaaaaaaaaaaaaaaaaa) {
+#   return 0;
+# }
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+# The number of characters to use for indentation of constructor initializer lists as well as inheritance lists.
+ConstructorInitializerIndentWidth: 4
+
+# Indent width for line continuations.
+# ContinuationIndentWidth: 2
+#
+# int i =         //  VeryVeryVeryVeryVeryLongComment
+#   longFunction( // Again a long comment
+#     arg);
+ContinuationIndentWidth: 2
+
+# true:                                  false:
+# vector<int> x{1, 2, 3, 4};     vs.     vector<int> x{ 1, 2, 3, 4 };
+# vector<T> x{{}, {}, {}, {}};           vector<T> x{ {}, {}, {}, {} };
+# f(MyMap[{composite, key}]);            f(MyMap[{ composite, key }]);
+# new int[3]{1, 2, 3};                   new int[3]{ 1, 2, 3 };
+Cpp11BracedListStyle: true
+
+# analyze the formatted file for the most common alignment of & and * and apply it
+DerivePointerAlignment: false
+
+# true:                                  false:
+# namespace a {                  vs.     namespace a {
+# foo();                                 foo();
+# } // namespace a;                      }
+FixNamespaceComments: true
+
+# A vector of macros that should be interpreted as foreach loops instead of as function calls.
+ForEachMacros: []
+
+# Dependent on the value, multiple #include blocks can be sorted as one and divided based on category.
+# Convert:
+# #include "b.h"               into      #include "a.h"
+#                                        #include "b.h"
+# #include <lib/main.h>
+# #include "a.h"                         #include <lib/main.h>
+IncludeBlocks: Preserve
+
+# Regular expressions denoting the different #include categories used for ordering #includes.
+# TODO: FIXME
+IncludeCategories:
+  - Regex:           '^(<|"(gtest|gmock|isl|json|catch)/)'
+    Priority:        3
+  - Regex:           '<[[:alnum:].]+>'
+    Priority:        4
+  - Regex:           '.*'
+    Priority:        1
+
+
+# Specify a regular expression of suffixes that are allowed in the file-to-main-include mapping.
+# When guessing whether a #include is the “main” include (to assign category 0, see above),
+# use this regex of allowed suffixes to the header stem. A partial match is done, so that:
+# - “” means “arbitrary suffix” - “$” means “no suffix”
+# TODO: FIXME
+IncludeIsMainRegex: "$"
+
+# false:                                 true:
+# switch (fool) {                vs.     switch (fool) {
+# case 1:                                  case 1:
+#   bar();                                   bar();
+#   break;                                   break;
+# default:                                 default:
+#   plop();                                  plop();
+# }                                      }
+IndentCaseLabels: true
+
+# The preprocessor directive indenting style to use.
+# #if FOO
+# #  if BAR
+# #    include <foo>
+# #  endif
+# #endif
+IndentPPDirectives: None
+
+# The number of columns to use for indentation.
+IndentWidth: 4
+
+# true:
+# LoooooooooooooooooooooooooooooooooooooooongReturnType
+#     LoooooooooooooooooooooooooooooooongFunctionDeclaration();
+#
+# false:
+# LoooooooooooooooooooooooooooooooooooooooongReturnType
+# LoooooooooooooooooooooooooooooooongFunctionDeclaration();
+IndentWrappedFunctionNames: true
+
+# true:                                  false:
+# if (foo) {                     vs.     if (foo) {
+#                                          bar();
+#   bar();                               }
+# }
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# language to apply this to
+Language: Cpp
+
+# A regular expression matching macros that start a block.
+MacroBlockBegin: ""
+MacroBlockEnd: ""
+
+# The maximum number of consecutive empty lines to keep.
+# MaxEmptyLinesToKeep: 1         vs.     MaxEmptyLinesToKeep: 0
+# int f() {                              int f() {
+#   int = 1;                                 int i = 1;
+#                                            i = foo();
+#   i = foo();                               return i;
+#                                        }
+#   return i;
+# }
+MaxEmptyLinesToKeep: 1
+
+# Indentation of namespaces
+# namespace out {
+# int i;
+# namespace in {
+# int i;
+# }
+# }
+NamespaceIndentation: None
+
+# we leave the penalties default, until we need to change them...
+# PenaltyBreakAssignment: 0
+# PenaltyBreakBeforeFirstCallParameter: 0
+# PenaltyBreakComment: 0
+# PenaltyBreakFirstLessLess: 0
+# PenaltyBreakString: 0
+# PenaltyBreakTemplateDeclaration: 0
+# PenaltyExcessCharacter: 0
+# PenaltyReturnTypeOnItsOwnLine: 0
+
+# Pointer and reference alignment style.
+PointerAlignment: Right
+
+# Reflow the comments
+# If true clang-format will try to reflow the comments
+ReflowComments: false
+
+# Sort the includes
+SortIncludes: true
+
+# Sort the "using" declarations
+SortUsingDeclarations: true
+
+# Put a space after a C-style cast
+# true:                                  false:
+# (int) i;                       vs.     (int)i;
+SpaceAfterCStyleCast: false
+
+# Put a space after the template keyword
+# true:                                  false:
+# template <int> void foo();     vs.     template<int> void foo();
+SpaceAfterTemplateKeyword: false
+
+# If false, spaces will be removed before assignment operators.
+# true:                                  false:
+# int a = 5;                     vs.     int a=5;
+# a += 42                                a+=42;
+SpaceBeforeAssignmentOperators: true
+
+# space will be inserted before a C++11 braced list used to initialize an object
+# true:                                  false:
+# Foo foo { bar };               vs.     Foo foo{ bar };
+# Foo {};                                Foo{};
+# vector<int> { 1, 2, 3 };               vector<int>{ 1, 2, 3 };
+# new int[3] { 1, 2, 3 };                new int[3]{ 1, 2, 3 };
+SpaceBeforeCpp11BracedList: false
+
+# true:                                  false:
+# class Foo : Bar {}             vs.     class Foo: Bar {}
+SpaceBeforeCtorInitializerColon: false
+
+# void f() { <- no space here before ()
+#   if (true) { <- space here before (true)
+#     f();
+#   }
+# }
+SpaceBeforeParens: ControlStatements
+
+# true:                                  false:
+# for (auto v : values) {}       vs.     for(auto v: values) {}
+SpaceBeforeRangeBasedForLoopColon: true
+
+# true:                                false:
+# void f( ) {                    vs.   void f() {
+#   int x[] = {foo( ), bar( )};          int x[] = {foo(), bar()};
+#   if (true) {                          if (true) {
+#     f( );                                f();
+#   }                                    }
+# }                                    }
+SpaceInEmptyParentheses: false
+
+# If true, spaces will be inserted into {}.
+# true:                                false:
+# void f() { }                   vs.   void f() {}
+# while (true) { }                     while (true) {}
+SpaceInEmptyBlock: false
+
+# SpacesBeforeTrailingComments: 3
+# void f() {
+#   if (true) {   // foo1
+#     f();        // bar
+#   }             // foo
+# }
+SpacesBeforeTrailingComments: 4
+
+# true:                                  false:
+# static_cast< int >(arg);       vs.     static_cast<int>(arg);
+# std::function< void(int) > fct;        std::function<void(int)> fct;
+SpacesInAngles: false
+
+# true:                                  false:
+# x = ( int32 )y                 vs.     x = (int32)y
+SpacesInCStyleCastParentheses: false
+
+# true:                                  false:
+# var arr = [ 1, 2, 3 ];         vs.     var arr = [1, 2, 3];
+# f({a : 1, b : 2, c : 3});              f({a: 1, b: 2, c: 3});
+SpacesInContainerLiterals: false
+
+# true:                                  false:
+# t f( Deleted & ) & = delete;   vs.     t f(Deleted &) & = delete;
+SpacesInParentheses: false
+
+# true:                                  false:
+# int a[ 5 ];                    vs.     int a[5];
+# std::unique_ptr<int[]> foo() {} // Won't be affected
+SpacesInSquareBrackets: false
+
+# Cpp03: Use C++03-compatible syntax.
+# Cpp11: Use features of C++11, C++14 and C++1z (e.g. A<A<int>> instead of A<A<int> >).
+# Auto: Automatic detection based on the input.
+Standard: Cpp11
+
+# The number of columns used for tab stops.
+# Setting stupid number here, because NEVER USE TABS
+TabWidth: 1337
+UseTab: Never

@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/CameraView.qml</file>
+        <file>qml/Custom/Button.qml</file>
+        <file>qml/Custom/CheckBox.qml</file>
+        <file>qml/Custom/CloseButton.qml</file>
+        <file>qml/Custom/MaterialFontButton.qml</file>
+        <file>qml/Custom/Page.qml</file>
+        <file>qml/Custom/RichText.qml</file>
+        <file>qml/Custom/ToolTip.qml</file>
+        <file>qml/InstructionsView.qml</file>
+        <file>qml/LicensesView.qml</file>
+        <file>qml/main.qml</file>
+        <file>qml/NumberEdit.qml</file>
+        <file>qml/PuzzleTable.qml</file>
+        <file>qml/PuzzleRect.qml</file>
+        <file>qml/ScanningView.qml</file>
+        <file>qml/SettingsView.qml</file>
+        <file>qml/SolvingView.qml</file>
+    </qresource>
+</RCC>
