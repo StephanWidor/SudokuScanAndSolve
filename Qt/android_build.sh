@@ -40,6 +40,7 @@ ${QT_PATH}/android/bin/androiddeployqt \
     --jdk ${JDK_PATH} \
     --gradle \
     --release \
-    --aab
+    --aab \
+    --deployment bundled
 
 cd ..
