@@ -1,5 +1,4 @@
 #include "qt/ImageProvider.h"
-#include <QQuickImageProvider>
 #include <opencv2/imgproc.hpp>
 
 QImage qt::ResultImageProvider::requestImage(const QString &, QSize *size, const QSize &requestedSize)

@@ -1,7 +1,6 @@
 #pragma once
 #include "cv/recognition/sudoku.h"
 #include <QAbstractVideoFilter>
-#include <QQuickImageProvider>
 #include <atomic>
 
 namespace qt {
@@ -34,7 +33,6 @@ public:
 
     QVideoFilterRunnable *createFilterRunnable() override;
 
-    // swdebug: rename this (confusing, cf lastOutputImg)!
     bool outputProcessingImg() const { return m_outputProcessingImg; }
     void outputProcessingImg(bool doIt)
     {
@@ -54,10 +52,10 @@ public slots:
     void processImg(const QUrl &url);
 
 signals:
-    void processingFinished();
-    void resultReady(bool success);
-    void acceptScanResult();
-    void outputProcessingImgChanged();
+    void processingFinished() const;
+    void resultReady(bool success) const;
+    void acceptScanResult() const;
+    void outputProcessingImgChanged() const;
 
 protected:
     void setCameraRotation(int rotation) { m_cameraRotation = rotation; }
