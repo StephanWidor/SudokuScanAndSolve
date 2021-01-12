@@ -36,11 +36,14 @@ qt::Application::Application(int argc, char *argv[])
     m_qmlEngine.rootContext()->setContextProperty("puzzle", &m_sudoku);
 
     auto pResultImageProvider = new ResultImageProvider();
-    QObject::connect(&m_processingFilter, &qt::ProcessingFilter::processingFinished, [this, pResultImageProvider]() {
-        const auto &lastResult = m_processingFilter.resultBuffer().back();
-        pResultImageProvider->setImage(lastResult.img);
-        emit m_processingFilter.resultReady(lastResult.success);
-    });
+    QObject::connect(
+      &m_processingFilter, &qt::ProcessingFilter::processingFinished, &m_qApplication,
+      [this, pResultImageProvider]() {
+          const auto &lastResult = m_processingFilter.resultBuffer().back();
+          pResultImageProvider->setImage(lastResult.img);
+          emit m_processingFilter.resultReady(lastResult.success);
+      },
+      Qt::QueuedConnection);
     m_qmlEngine.addImageProvider("scanResult", pResultImageProvider);
 
     m_qmlEngine.load(QUrl(QLatin1String("qrc:/qml/main.qml")));

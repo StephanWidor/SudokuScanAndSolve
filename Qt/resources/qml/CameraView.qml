@@ -14,13 +14,11 @@ Item {
         {
             if(loader.item === null)
                 loader.sourceComponent = loadComponent
-            else
-                loader.item.startCamera()
         }
         else
         {
             if(loader.item !== null)
-                loader.item.stopCamera()
+                loader.sourceComponent = null
         }
     }
 
@@ -53,14 +51,6 @@ Item {
         Item {
             property bool flashAvailable: camera.flash.supportedModes.includes(Camera.FlashVideoLight)
             property bool torchOn: camera.flash.mode === Camera.FlashVideoLight
-            function startCamera()
-            {
-                camera.start()
-            }
-            function stopCamera()
-            {
-                camera.stop()
-            }
             function switchTorch(on)
             {
                 if(on)
