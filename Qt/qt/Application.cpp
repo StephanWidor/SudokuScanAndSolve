@@ -17,6 +17,13 @@ qt::Application::Application(int argc, char *argv[])
     sudoku::loadState(FileSystem::appDataDir() / "state.yaml", m_sudoku.app(), [this](bool outputProcessingImg) {
         m_processingFilter.outputProcessingImg(outputProcessingImg);
     });
+    QObject::connect(&m_qApplication, &QGuiApplication::applicationStateChanged, [&](Qt::ApplicationState state) {
+        if (state == Qt::ApplicationSuspended)
+        {
+            sudoku::saveState(FileSystem::appDataDir() / "state.yaml", m_sudoku.app(),
+                              m_processingFilter.outputProcessingImg());
+        }
+    });
 
     QObject::connect(&m_processingFilter, &qt::ProcessingFilter::acceptScanResult, [this]() {
         m_sudoku.setSheet(cv::recognition::sudoku::votedSheet(m_processingFilter.resultBuffer(), m_classifier));
@@ -35,7 +42,7 @@ qt::Application::Application(int argc, char *argv[])
     m_qmlEngine.rootContext()->setContextProperty("processingFilter", &m_processingFilter);
     m_qmlEngine.rootContext()->setContextProperty("puzzle", &m_sudoku);
 
-    auto pResultImageProvider = new ResultImageProvider();
+    auto pResultImageProvider = new ResultImageProvider();    // m_qmlEngine will take over ownership
     QObject::connect(
       &m_processingFilter, &qt::ProcessingFilter::processingFinished, &m_qApplication,
       [this, pResultImageProvider]() {
