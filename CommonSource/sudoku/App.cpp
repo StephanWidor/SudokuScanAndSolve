@@ -143,37 +143,45 @@ void sudoku::App::considerDiagonals(bool considerDiagonals)
 
 bool sudoku::saveState(const std::filesystem::path &path, const sudoku::App &sudokuApp, bool outputProcessingImg)
 {
-    cv::FileStorage file;
-    file.open(path.string(), cv::FileStorage::WRITE);
-    if (file.isOpened())
+    try
     {
-        file << "sudokuSheet" << std::vector<sudoku::Value>(sudokuApp.sheet().begin(), sudokuApp.sheet().end());
-        file << "considerDiagonals" << sudokuApp.diagonalsConsidered();
-        file << "outputProcessingImg" << outputProcessingImg;
-        file.release();
-        return true;
+        cv::FileStorage file(path.string(), cv::FileStorage::WRITE);
+        if (file.isOpened())
+        {
+            file << "sudokuSheet" << std::vector<sudoku::Value>(sudokuApp.sheet().begin(), sudokuApp.sheet().end());
+            file << "considerDiagonals" << sudokuApp.diagonalsConsidered();
+            file << "outputProcessingImg" << outputProcessingImg;
+            file.release();
+            return true;
+        }
     }
+    catch (...)
+    {}
     return false;
 }
 
 bool sudoku::loadState(const std::filesystem::path &path, sudoku::App &o_sudokuApp,
                        std::function<void(bool)> outputProcessingImgSetter)
 {
-    cv::FileStorage file;
-    file.open(path.string(), cv::FileStorage::READ);
-    if (file.isOpened())
+    try
     {
-        std::vector<sudoku::Value> sheet;
-        file["sudokuSheet"] >> sheet;
-        o_sudokuApp.setSheet({utils::makeArray<81>([sheet](size_t i) { return sheet[i]; })});
-        o_sudokuApp.clearHistory();
-        bool considerDiagonals = false, outputProcessingImg = true;
-        file["considerDiagonals"] >> considerDiagonals;
-        o_sudokuApp.considerDiagonals(considerDiagonals);
-        file["outputProcessingImg"] >> outputProcessingImg;
-        outputProcessingImgSetter(outputProcessingImg);
-        file.release();
-        return true;
+        cv::FileStorage file(path.string(), cv::FileStorage::READ);
+        if (file.isOpened())
+        {
+            std::vector<sudoku::Value> sheet;
+            file["sudokuSheet"] >> sheet;
+            o_sudokuApp.setSheet({utils::makeArray<81>([sheet](size_t i) { return sheet[i]; })});
+            o_sudokuApp.clearHistory();
+            bool considerDiagonals = false, outputProcessingImg = true;
+            file["considerDiagonals"] >> considerDiagonals;
+            o_sudokuApp.considerDiagonals(considerDiagonals);
+            file["outputProcessingImg"] >> outputProcessingImg;
+            outputProcessingImgSetter(outputProcessingImg);
+            file.release();
+            return true;
+        }
     }
+    catch (...)
+    {}
     return false;
 }
