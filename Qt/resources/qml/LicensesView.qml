@@ -44,7 +44,7 @@ There is different licenses for Qt. As this app is open source, we can use the \
                 topPadding: 20
                 color: Style.lightGray
                 font.bold: true
-                text: "OpenCV 4.5.1"
+                text: "OpenCV 4.8.0"
             }
             Custom.RichText {
                 Layout.fillWidth: true
@@ -52,7 +52,7 @@ There is different licenses for Qt. As this app is open source, we can use the \
                 wrapMode: Text.WordWrap
                 textFormat: Text.RichText
                 text: "
-OpenCV is licensed under <a href='https://github.com/opencv/opencv/blob/4.5.1/LICENSE'>Apache License 2.0</a>.
+OpenCV is licensed under <a href='https://github.com/opencv/opencv/blob/4.8.0/LICENSE'>Apache License 2.0</a>.
 "
             }
             Label {

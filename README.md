@@ -22,7 +22,7 @@ First thing to do is init and update the submodule:
 Depending on what platform you want to build for, you should have a look into build_`<Platform>`.config inside OpenCV folder. Paths etc are set like they are on my machines, but will probably be different on yours.
 You can either call the OpenCV build script now , or let cmake do it later (if it notices that there is no OpenCV-4.5.1 folder).
 If you want to do it now, cd into OpenCV folder and call the script:
-`./build.sh <Platform> 4.5.1`.
+`./build.sh <Platform> 4.8.0`.
 As mentioned above, config step might tell you if something is missing. Build process can take some time.
 
 
