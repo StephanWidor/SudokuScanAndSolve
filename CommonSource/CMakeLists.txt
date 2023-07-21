@@ -16,6 +16,11 @@ if(ANDROID)
     set(ANDROID_MIN_SDK_VERSION 26)
 endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # gcc uses tbb for parallel algorithms
+    find_package(TBB)
+endif()
+
 set(HEADERS
     base/ExecutionHelp.h
     base/colors.h
@@ -56,6 +61,14 @@ target_link_libraries(${PROJECT_NAME}
    PUBLIC
    OpenCV
    )
+
+if(TBB_FOUND)
+    message("linking to tbb for parallel execution in gcc build")
+    target_link_libraries(${PROJECT_NAME}
+       PUBLIC
+       TBB::tbb
+       )
+endif()
 
 if(ENABLE_TESSERACT)
     message("Tesseract enabled")
