@@ -33,6 +33,23 @@ Custom.Page {
         Item {
             Layout.preferredHeight: 20
         }
+        RowLayout {
+            Label {
+                text: "Create more difficult Puzzles"
+                color: Style.lightGray
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            Custom.CheckBox {
+                penColor: Style.lightGray
+                checked: puzzle.createDifficult
+                onClicked: puzzle.createDifficult = checked
+            }
+        }
+        Item {
+            Layout.preferredHeight: 20
+        }
         Rectangle {
             Layout.fillWidth: true
             height: 2

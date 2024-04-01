@@ -46,6 +46,10 @@ public:
 
     void considerDiagonals(bool considerDiagonals);
 
+    bool createDifficult() const { return m_createDifficult; }
+
+    void createDifficult(bool createDifficult);
+
     void clearPuzzle();
 
     void createPuzzle();
@@ -56,6 +60,7 @@ public:
 
 private:
     bool m_diagonalsConsidered{false};
+    bool m_createDifficult{true};
     SolutionState m_solutionState{SolutionState::Empty};
     sudoku::Sheet m_sheet{};
     CellSelection m_cellSelection{std::monostate{}};

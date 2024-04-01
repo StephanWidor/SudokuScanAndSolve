@@ -115,7 +115,7 @@ void sudoku::App::clearPuzzle()
 
 void sudoku::App::createPuzzle()
 {
-    m_sheet = sudoku::create(m_diagonalsConsidered, true);
+    m_sheet = sudoku::create(m_diagonalsConsidered, m_createDifficult);
     m_solutionState = SolutionState::Unique;
     m_history.push(m_sheet);
     m_cellSelection = std::monostate{};
@@ -141,6 +141,11 @@ void sudoku::App::considerDiagonals(bool considerDiagonals)
     m_solutionState = sudoku::solutionState(m_sheet, m_diagonalsConsidered);
 }
 
+void sudoku::App::createDifficult(bool createDifficult)
+{
+    m_createDifficult = createDifficult;
+}
+
 bool sudoku::saveState(const std::filesystem::path &path, const sudoku::App &sudokuApp, bool outputProcessingImg)
 {
     try
@@ -150,6 +155,7 @@ bool sudoku::saveState(const std::filesystem::path &path, const sudoku::App &sud
         {
             file << "sudokuSheet" << std::vector<sudoku::Value>(sudokuApp.sheet().begin(), sudokuApp.sheet().end());
             file << "considerDiagonals" << sudokuApp.diagonalsConsidered();
+            file << "createDifficult" << sudokuApp.createDifficult();
             file << "outputProcessingImg" << outputProcessingImg;
             file.release();
             return true;
@@ -172,9 +178,11 @@ bool sudoku::loadState(const std::filesystem::path &path, sudoku::App &o_sudokuA
             file["sudokuSheet"] >> sheet;
             o_sudokuApp.setSheet({utils::makeArray<81>([sheet](size_t i) { return sheet[i]; })});
             o_sudokuApp.clearHistory();
-            bool considerDiagonals = false, outputProcessingImg = true;
+            bool considerDiagonals = false, createDifficult = true, outputProcessingImg = true;
             file["considerDiagonals"] >> considerDiagonals;
             o_sudokuApp.considerDiagonals(considerDiagonals);
+            file["createDifficult"] >> createDifficult;
+            o_sudokuApp.createDifficult(createDifficult);
             file["outputProcessingImg"] >> outputProcessingImg;
             outputProcessingImgSetter(outputProcessingImg);
             file.release();

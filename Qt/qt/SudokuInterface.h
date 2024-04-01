@@ -15,6 +15,7 @@ class SudokuInterface : public QAbstractTableModel
     Q_PROPERTY(QString solutionState READ solutionState NOTIFY stateChanged)
     Q_PROPERTY(QColor solutionStateColor READ solutionStateColor NOTIFY stateChanged)
     Q_PROPERTY(bool considerDiagonals READ diagonalsConsidered WRITE considerDiagonals NOTIFY stateChanged)
+    Q_PROPERTY(bool createDifficult READ getCreateDifficult WRITE setCreateDifficult NOTIFY stateChanged)
     Q_PROPERTY(bool hasHistory READ hasHistory NOTIFY stateChanged)
 
 public:
@@ -133,6 +134,16 @@ protected:
         if (m_sudokuApp.diagonalsConsidered() != considerDiagonals)
         {
             m_sudokuApp.considerDiagonals(considerDiagonals);
+            updateUI();
+        }
+    }
+
+    bool getCreateDifficult() const { return m_sudokuApp.createDifficult(); }
+    void setCreateDifficult(bool createDifficult)
+    {
+        if (m_sudokuApp.createDifficult() != createDifficult)
+        {
+            m_sudokuApp.createDifficult(createDifficult);
             updateUI();
         }
     }
