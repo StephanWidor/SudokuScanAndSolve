@@ -1,25 +1,13 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.25)
 project(CommonSource LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(OPENCV_VERSION 4.8.0 CACHE STRING "")
 option(ENABLE_TESSERACT "" OFF)
 set(DEFAULT_TRAINDATADIR ${CMAKE_CURRENT_SOURCE_DIR}/../assets/TrainData)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../OpenCV ${CMAKE_CURRENT_BINARY_DIR}/OpenCV)
-
-if(ANDROID)
-    add_compile_options(-fopenmp)
-    add_link_options(-fopenmp -static-openmp)
-    set(ANDROID_MIN_SDK_VERSION 26)
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # gcc uses tbb for parallel algorithms
-    find_package(TBB)
-endif()
 
 set(HEADERS
     base/ExecutionHelp.h
@@ -59,8 +47,24 @@ add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_link_libraries(${PROJECT_NAME}
    PUBLIC
-   OpenCV
+   BuildOpenCV
    )
+
+if(ANDROID)
+    # find_package doesn't seem to work on android
+    add_compile_options(-fopenmp)
+    add_link_options(-fopenmp -static-openmp)
+else()
+    find_package(OpenMP COMPONENTS CXX)
+    if(OpenMP_FOUND)
+        target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+    endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # gcc uses tbb for parallel algorithms
+    find_package(TBB)
+endif()
 
 if(TBB_FOUND)
     message("linking to tbb for parallel execution in gcc build")

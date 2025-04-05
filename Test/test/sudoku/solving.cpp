@@ -1,8 +1,8 @@
 #include "test/sudoku/solving.h"
-#include "sudoku/creator.h"
-#include "sudoku/solver.h"
 #include "test/utils.h"
 #include <iostream>
+#include <sudoku/creator.h>
+#include <sudoku/solver.h>
 
 void test::sudoku::runAll(const std::filesystem::path &sheetsFolder)
 {

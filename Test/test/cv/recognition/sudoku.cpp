@@ -1,13 +1,12 @@
 #include "test/cv/recognition/sudoku.h"
-#include "cv/recognition/sudoku.h"
-#include "sudoku/Sheet.h"
 #include "test/utils.h"
-#include <execution>
+#include <cv/imageUtils.h>
+#include <cv/recognition/sudoku.h>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <numeric>
 #include <opencv2/highgui.hpp>
+#include <sudoku/Sheet.h>
 
 namespace {
 
@@ -72,7 +71,7 @@ Result testImageFile(const std::filesystem::path &file, const cv::recognition::d
     auto scanResult = cv::recognition::sudoku::process(cv::imread(file.string(), cv::IMREAD_GRAYSCALE),
                                                        cv::recognition::sudoku::Config::defaultPicture());
     result.success = scanResult;
-    result.sheet = cv::recognition::sudoku::readSheet(scanResult.cellImages, classifier, std::execution::par);
+    result.sheet = cv::recognition::sudoku::readSheet(scanResult.cellImages, classifier, true);
     result.durationInSeconds = timer.secondsAsDouble();
     result.outputImg = scanResult.img;
     if (result.success)

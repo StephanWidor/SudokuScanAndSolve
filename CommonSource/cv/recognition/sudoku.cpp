@@ -1,15 +1,14 @@
 #include "cv/recognition/sudoku.h"
 #include "base/ExecutionHelp.h"
 #include "base/colors.h"
-#include "base/math.h"
 #include "cv/contourUtils.h"
 #include "cv/imageUtils.h"
 #include "cv/recognition/digit.h"
 #include "cv/utils2d.h"
-#include <execution>
 #include <numeric>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+
 namespace {
 
 using cv::recognition::sudoku::Config;
@@ -163,8 +162,8 @@ cv::Mat extractGridPointsImage(const cv::Mat &gridImg, bool doSobel)
 {
     std::array<cv::Mat, 2> lines;
     std::array<bool, 2> vertical{false, true};
-    std::transform(std::execution::par, vertical.begin(), vertical.end(), lines.begin(),
-                   [&](bool vertical) { return extractLinesImage(gridImg, vertical, doSobel); });
+    execution_help::transform(vertical.begin(), vertical.end(), lines.begin(),
+                              [&](bool vertical) { return extractLinesImage(gridImg, vertical, doSobel); });
     if (!lines[0].empty() && !lines[1].empty())
     {
         cv::Mat gridPointsImg(gridImg.size(), CV_8UC1, cv::Scalar(0));
@@ -302,8 +301,8 @@ std::array<cv::Mat, 81> cellImages(const cv::Mat &img, const cv::ContourVector &
 {
     assert(cellContours.size() == 81);
     std::array<cv::Mat, 81> cellImages;
-    std::transform(std::execution::par, cellContours.begin(), cellContours.end(), cellImages.begin(),
-                   [&img](const auto &contour) { return cv::warpedContourInterior(img, contour); });
+    execution_help::transform(cellContours.begin(), cellContours.end(), cellImages.begin(),
+                              [&img](const auto &contour) { return cv::warpedContourInterior(img, contour); });
     return cellImages;
 }
 
@@ -365,19 +364,36 @@ cv::recognition::sudoku::Result cv::recognition::sudoku::camFailResult()
     return {false, {}, makeImg()};
 }
 
+::sudoku::Sheet cv::recognition::sudoku::readSheet(const std::array<cv::Mat, 81> &cellImages,
+                                                   const cv::recognition::digit::Classifier &classifier,
+                                                   bool doParallel)
+{
+    ::sudoku::Sheet sheet;
+    if (doParallel)
+    {
+        execution_help::transform(cellImages.begin(), cellImages.end(), sheet.begin(),
+                                  [&classifier](const auto &img) { return classifier.classify(img); });
+    }
+    else
+    {
+        std::transform(cellImages.begin(), cellImages.end(), sheet.begin(),
+                       [&classifier](const auto &img) { return classifier.classify(img); });
+    }
+    return sheet;
+}
+
 sudoku::Sheet cv::recognition::sudoku::votedSheet(const std::vector<Result> &results,
                                                   const cv::recognition::digit::Classifier &classifier, size_t offset)
 {
     if (results.size() <= offset)
         return {};
     if (results.size() < offset + 3)
-        return readSheet(results.back().cellImages, classifier, std::execution::par);
+        return readSheet(results.back().cellImages, classifier, true);
 
     std::vector<::sudoku::Sheet> sheets(results.size() - offset);
-    std::transform(std::execution::par, results.begin() + offset, results.end(), sheets.begin(),
-                   [&classifier](const sudoku::Result &result) {
-                       return readSheet(result.cellImages, classifier, std::execution::seq);
-                   });
+    execution_help::transform(
+      results.begin() + offset, results.end(), sheets.begin(),
+      [&classifier](const sudoku::Result &result) { return readSheet(result.cellImages, classifier, false); });
 
     using ValueIncidences = std::array<size_t, 10>;
     using BufferGrid = std::array<ValueIncidences, 81>;

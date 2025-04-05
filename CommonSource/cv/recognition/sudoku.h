@@ -1,10 +1,6 @@
 #pragma once
-#include "base/ExecutionHelp.h"
-#include "cv/imageUtils.h"
 #include "cv/recognition/digit.h"
 #include "sudoku/Sheet.h"
-#include <initializer_list>
-#include <mutex>
 
 namespace cv::recognition::sudoku {
 
@@ -52,15 +48,8 @@ Result process(const cv::Mat &img, const Config &config = Config::defaultVideo()
 
 Result camFailResult();
 
-template<class ExecutionPolicy>
 ::sudoku::Sheet readSheet(const std::array<cv::Mat, 81> &cellImages,
-                          const cv::recognition::digit::Classifier &classifier, ExecutionPolicy &&policy)
-{
-    ::sudoku::Sheet sheet;
-    std::transform(std::forward<ExecutionPolicy>(policy), cellImages.begin(), cellImages.end(), sheet.begin(),
-                   [&classifier](const auto &img) { return classifier.classify(img); });
-    return sheet;
-}
+                          const cv::recognition::digit::Classifier &classifier, bool doParallel);
 
 ::sudoku::Sheet votedSheet(const std::vector<Result> &results, const cv::recognition::digit::Classifier &classifier,
                            size_t offset = 0);

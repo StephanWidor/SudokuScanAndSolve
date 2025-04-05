@@ -1,8 +1,8 @@
 #include "test/utils.h"
-#include "sudoku/Sheet.h"
-#include "sudoku/creator.h"
 #include <iostream>
 #include <opencv2/highgui.hpp>
+#include <sudoku/Sheet.h>
+#include <sudoku/creator.h>
 
 size_t test::utils::diff(const sudoku::Sheet &sheet0, const sudoku::Sheet &sheet1)
 {

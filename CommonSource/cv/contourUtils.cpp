@@ -17,7 +17,7 @@ bool cv::contourWithinCornerConnections(const cv::Contour &contour, const cv::Co
     };
     std::array<std::pair<cv::Line2d, double>, 4> connections = {connection(0), connection(1), connection(2),
                                                                 connection(3)};
-    return std::all_of(std::execution::par, contour.begin(), contour.end(), [&](const cv::Point &p) {
+    return execution_help::all_of(contour.begin(), contour.end(), [&](const cv::Point &p) {
         return std::all_of(connections.begin(), connections.end(), [&](const auto &connection) {
             double dist = cv::signedDist(connection.first, p);
             return dist <= connection.second;

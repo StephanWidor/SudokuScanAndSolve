@@ -1,5 +1,5 @@
 #pragma once
-#include "cv/recognition/digit.h"
+#include <cv/recognition/digit.h>
 #include <filesystem>
 
 namespace test::cv::recognition::digit {
