@@ -25,8 +25,6 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     set(ENABLE_TESSERACT ON CACHE BOOL "")
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../CommonSource ${CMAKE_CURRENT_BINARY_DIR}/CommonSource)
-
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME}
     PUBLIC

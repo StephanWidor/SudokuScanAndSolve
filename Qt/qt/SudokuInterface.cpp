@@ -1,5 +1,4 @@
 #include "qt/SudokuInterface.h"
-#include "base/utils.h"
 #include "qt/Style.h"
 
 namespace {}
@@ -12,9 +11,9 @@ QVariant qt::SudokuInterface::data(const QModelIndex &index, int role) const
         case CellRoles::BackgroundColor:
             return m_sudokuApp.cellSelected(cellIndex) ? Style::orange() : Style::white();
         case CellRoles::TextColor:
-            return m_sudokuApp.cellSelected(cellIndex) ?
-                     Style::lightGray() :
-                     m_sudokuApp.valueSelected(cellIndex) ? Style::orange() : Style::darkGray();
+            return m_sudokuApp.cellSelected(cellIndex)  ? Style::lightGray() :
+                   m_sudokuApp.valueSelected(cellIndex) ? Style::orange() :
+                                                          Style::darkGray();
         case CellRoles::TextBold:
             return m_sudokuApp.valueSelected(cellIndex);
         case CellRoles::Text:

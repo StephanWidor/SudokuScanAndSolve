@@ -1,77 +1,144 @@
 #include "qt/ProcessingFilter.h"
 #include "cv/recognition/sudoku.h"
-#include "qt/FileSystem.h"
-#include "qt/imageConvert.h"
 #include <QDebug>
 #include <QImage>
 #include <QImageReader>
 #include <opencv2/highgui.hpp>
 #include <thread>
 
-namespace {
+#if QT_CONFIG(permissions)
+#include <QPermission>
+#endif
 
-void rotate(cv::Mat &io_img, int cameraRotation)
+namespace qt {
+
+void ProcessingFilter::InputSocket::push(const QVideoFrame &frame)
 {
-    if (std::abs(cameraRotation) < 45)
+    if (!frame.isValid())
+    {
+        qWarning() << "frame is invalid";
         return;
-    cameraRotation = cameraRotation % 360;
-    if (cameraRotation < 0)
-        cameraRotation += 360;
-    if (cameraRotation < 135)
-        cv::rotate(io_img, io_img, cv::ROTATE_90_COUNTERCLOCKWISE);
-    else if (cameraRotation > 225)
-        cv::rotate(io_img, io_img, cv::ROTATE_90_CLOCKWISE);
+    }
+
+    std::lock_guard lock(mutex);
+
+    if (QVideoFrame copyFrame(frame);    // shallow copy
+        copyFrame.map(QVideoFrame::ReadOnly))    // (map is a const member function)
+    {
+        img = copyFrame.toImage().convertToFormat(QImage::Format_Grayscale8);
+        copyFrame.unmap();
+        newImgAvailable = true;
+    }
     else
-        cv::rotate(io_img, io_img, cv::ROTATE_180);
+        qWarning() << "couldn't map video frame";
 }
 
-}    // namespace
-
-QVideoFrame qt::ProcessingFilterRunnable::run(QVideoFrame *input, const QVideoSurfaceFormat &, RunFlags)
+cv::Mat ProcessingFilter::InputSocket::get()
 {
-    if (m_filter.m_resultBuffer.size() >= ProcessingFilter::resultBufferSize)
-        return *input;
-    cv::Mat img = toMat(*input);
-    if (img.empty())
+    std::lock_guard lock(mutex);
+    if (newImgAvailable)
     {
-        m_filter.m_resultBuffer.push_back(cv::recognition::sudoku::camFailResult());
-        emit m_filter.processingFinished();
-        return *input;
+        newImgAvailable = false;
+        return cv::Mat(img.height(), img.width(), CV_8UC1, img.bits(), img.bytesPerLine()).clone();
     }
-#if defined(ANDROID) || defined(_WIN32)
-    cv::flip(img, img, 0);    // whyever this is neccessary...
-#endif
-    const auto cameraRotation = m_filter.m_cameraRotation.load();
-    rotate(img, cameraRotation);
+    return cv::Mat();
+}
 
-    auto scanResult = cv::recognition::sudoku::process(img, cv::recognition::sudoku::Config::defaultVideo());
-    img = m_filter.m_outputProcessingImg ? scanResult.processingImg : scanResult.img;
-    if (scanResult)
+void ProcessingFilter::OutputSocket::push(const cv::Mat &img)
+{
+    if (mutex.try_lock())
     {
-        m_filter.m_resultBuffer.push_back(std::move(scanResult));
-        if (m_filter.m_resultBuffer.size() >= ProcessingFilter::resultBufferSize)
-            emit m_filter.processingFinished();
+        if (pSink)
+        {
+            pSink->setVideoFrame(
+              QVideoFrame(QImage(img.data, img.cols, img.rows, img.step, QImage::Format_Grayscale8).copy()));
+        }
+        mutex.unlock();
     }
+}
 
-    rotate(img, -cameraRotation);
-#if defined(_WIN32)    // not sure if this is only on my Win machine..
-    cv::flip(img, img, 0);
+void ProcessingFilter::OutputSocket::setSink(QVideoSink *pNewSink)
+{
+    if (pNewSink == pSink)
+        return;
+    std::lock_guard lock(mutex);
+    pSink = pNewSink;
+}
+
+ProcessingFilter::ProcessingFilter(QObject *pParent): QObject(pParent)
+{
+    connect(&m_inputSocket.sink, &QVideoSink::videoFrameChanged, this, &ProcessingFilter::onInputFrame);
+}
+
+ProcessingFilter::~ProcessingFilter()
+{
+    disconnect(&m_inputSocket.sink, &QVideoSink::videoFrameChanged, this, &ProcessingFilter::onInputFrame);
+    stopCameraThread();
+    while (m_state.load(std::memory_order::acquire) != State::Idle)
+        ;
+}
+
+void ProcessingFilter::onInputFrame(const QVideoFrame &frame)
+{
+    m_inputSocket.push(frame);
+}
+
+bool ProcessingFilter::startCameraThread()
+{
+#if QT_CONFIG(permissions)
+    QCameraPermission cameraPermission;
+    if (qApp->checkPermission(cameraPermission) != Qt::PermissionStatus::Granted)
+    {
+        qWarning() << "Don't have camera permission, will not start processing";
+        return false;
+    }
 #endif
 
-    if (QVideoFrame output = toQVideoFrame(img); output.width() != 0)
-        return output;
-    return *input;
+    State idleState = State::Idle;
+    if (!m_state.compare_exchange_strong(idleState, State::ThreadProcessing, std::memory_order::acq_rel))
+        return false;
+
+    const auto runProcessingLoop = [&]() {
+        m_resultBuffer.clear();
+        while (m_state.load(std::memory_order::acquire) == State::ThreadProcessing)
+        {
+            auto img = m_inputSocket.get();
+            if (img.empty() || m_resultBuffer.size() >= ProcessingFilter::resultBufferSize)
+                continue;
+
+            auto scanResult = cv::recognition::sudoku::process(img, cv::recognition::sudoku::Config::defaultVideo());
+            m_outputSocket.push(m_showProcessingImg ? scanResult.processingImg : scanResult.img);
+            if (scanResult)
+            {
+                m_resultBuffer.push_back(std::move(scanResult));
+                if (m_resultBuffer.size() >= ProcessingFilter::resultBufferSize)
+                {
+                    emit processingFinished();
+                    stopCameraThread();
+                }
+            }
+        }
+        m_state.store(State::Idle, std::memory_order::release);
+    };
+
+    std::thread processingThread(runProcessingLoop);
+    processingThread.detach();
+
+    return true;
 }
 
-QVideoFilterRunnable *qt::ProcessingFilter::createFilterRunnable()
+void ProcessingFilter::stopCameraThread()
 {
-    m_resultBuffer.clear();
-    return new ProcessingFilterRunnable(*this);
+    State threadProcessingState = State::ThreadProcessing;
+    m_state.compare_exchange_strong(threadProcessingState, State::ThreadShouldStop, std::memory_order::acq_rel);
 }
 
-void qt::ProcessingFilter::processImg(const QUrl &url)
+void qt::ProcessingFilter::processSingleImg(const QUrl &url)
 {
-    FileSystem::requestPermission(FileSystem::AccessType::Read);
+    State idleState = State::Idle;
+    if (!m_state.compare_exchange_strong(idleState, State::SingleProcessing, std::memory_order::acq_rel))
+        return;
+
     m_resultBuffer.clear();
 
     QImageReader reader;
@@ -85,7 +152,14 @@ void qt::ProcessingFilter::processImg(const QUrl &url)
     QImage qImg;
     if (!reader.read(&qImg))
         qDebug() << "couldn't open " << url.toString();
-    auto scanResult = cv::recognition::sudoku::process(toMat(qImg), cv::recognition::sudoku::Config::defaultPicture());
+
+    qImg = qImg.convertToFormat(QImage::Format_BGR888);
+    auto cvImg = cv::Mat(qImg.height(), qImg.width(), CV_8UC3, qImg.bits(), qImg.bytesPerLine()).clone();
+
+    auto scanResult = cv::recognition::sudoku::process(cvImg, cv::recognition::sudoku::Config::defaultPicture());
     m_resultBuffer.push_back(std::move(scanResult));
     emit processingFinished();
+    m_state.store(State::Idle, std::memory_order::release);
 }
+
+}    // namespace qt

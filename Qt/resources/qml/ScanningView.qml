@@ -1,19 +1,21 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15
-import QtQuick.Dialogs 1.2
-import QtMultimedia 5.15
+import QtQuick
+import QtCore
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtQuick.Dialogs
+import QtMultimedia
 import "Custom" as Custom
-import stephanwidor.SudokuScanAndSolve 1.0
+import stephanwidor.SudokuScanAndSolve 1.1
 
 Drawer {
     id: scanningView
     opacity: 0.9
     interactive: false
-    property int downFillHeight: 10
+    property int downFillHeight: 8
     onClosed: {
         scanningRect.state = ""
     }
+
     property bool scanSuccess: false
     Connections {
         target: processingFilter
@@ -23,13 +25,20 @@ Drawer {
         }
     }
 
+    CameraHandle {
+        id: cameraHandle
+        videoOutput: processingFilter
+    }
+
     FileDialog {
         id: loadDialog
         title: "Choose a Picture to Scan"
-        folder: shortcuts.pictures
-        selectMultiple: false
+        currentFolder: StandardPaths.writableLocation(
+                           StandardPaths.PicturesLocation)
+        fileMode: FileDialog.OpenFile
+        modality: Qt.ApplicationModal
         nameFilters: ["Image files (*.jpg *.png)"]
-        onAccepted: processingFilter.processImg(fileUrl)
+        onAccepted: processingFilter.processSingleImg(loadDialog.selectedFile)
         onRejected: scanningRect.state = ""
     }
 
@@ -40,16 +49,27 @@ Drawer {
 
         property int stateChangeCount: 0
         onStateChanged: ++stateChangeCount
+        property bool cameraStarted: false
         states: [
             State {
+                name: ""
+                StateChangeScript {
+                    script: {
+                        cameraHandle.stop()
+                    }
+                }
+            },
+            State {
                 name: "scanning"
-                PropertyChanges {
-                    target: headerLabel
-                    text: "Scanning..."
+                property string headerLabelText: "Scanning..."
+                StateChangeScript {
+                    script: {
+                        scanningRect.cameraStarted = cameraHandle.start()
+                    }
                 }
                 PropertyChanges {
-                    target: cameraView
-                    doScan: true
+                    target: headerLabel
+                    text: scanningRect.cameraStarted ? "Scanning..." : "Couldn't start, camera permissions granted?"
                 }
                 PropertyChanges {
                     target: cancelButton
@@ -66,6 +86,11 @@ Drawer {
             },
             State {
                 name: "open file"
+                StateChangeScript {
+                    script: {
+                        cameraHandle.stop()
+                    }
+                }
                 PropertyChanges {
                     target: headerLabel
                     text: "Open File..."
@@ -77,16 +102,22 @@ Drawer {
             },
             State {
                 name: "showing result"
+                StateChangeScript {
+                    script: {
+                        cameraHandle.stop()
+                    }
+                }
                 PropertyChanges {
                     target: headerLabel
-                    text: scanningView.scanSuccess? "Found Sudoku" : "No Sudoku Found"
-                    color: scanningView.scanSuccess? Style.green : Style.red
+                    text: scanningView.scanSuccess ? "Found Sudoku" : "No Sudoku Found"
+                    color: scanningView.scanSuccess ? Style.green : Style.red
                 }
                 PropertyChanges {
                     target: resultImg
                     visible: true
                     // we need to change id every time. seems otherwise we get a cached old image version
-                    source: "image://scanResult/" + Number(scanningRect.stateChangeCount).toString()
+                    source: "image://scanResult/" + Number(
+                                scanningRect.stateChangeCount).toString()
                 }
                 PropertyChanges {
                     target: acceptButton
@@ -108,13 +139,13 @@ Drawer {
                     id: torchCheck
                     text: "Torch"
                     penColor: Style.lightGray
-                    visible: cameraView.flashAvailable
-                    checked: cameraView.torchOn
-                    onClicked: cameraView.switchTorch(checked)
+                    visible: cameraHandle.torchAvailable
+                    checked: cameraHandle.torchMode === Camera.TorchOn
+                    onClicked: cameraHandle.toggleTorch()
                 }
                 Item {
                     Layout.fillWidth: true
-                    visible: cameraView.flashAvailable
+                    visible: cameraHandle.torchAvailable
                 }
                 Label {
                     id: headerLabel
@@ -126,22 +157,40 @@ Drawer {
                 }
                 Custom.CloseButton {
                     id: closeButton
-                    onClicked: scanningView.close()
+                    onClicked: {
+                        cameraHandle.stop()
+                        scanningView.close()
+                    }
                 }
             }
 
-            CameraView {
-                id: cameraView
+            VideoOutput {
+                id: videoOutput
+                visible: scanningRect.state === "scanning"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                fillMode: VideoOutput.PreserveAspectFit
+                Component.onCompleted: {
+                    processingFilter.setOutputSink(videoOutput.videoSink)
+                }
+                Component.onDestruction: {
+                    processingFilter.setOutputSink(null)
+                }
             }
 
             Image {
                 id: resultImg
-                visible: false// scanningRect.state == "showing result"
+                visible: scanningRect.state === "showing result"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 fillMode: Image.PreserveAspectFit
+            }
+
+            Item {
+                id: fillItem
+                visible: scanningRect.state === ""
+                Layout.fillWidth: true
+                Layout.fillHeight: true
             }
 
             RowLayout {
@@ -149,7 +198,7 @@ Drawer {
                 Layout.alignment: Qt.AlignHCenter
 
                 Custom.Button {
-                    id:acceptButton
+                    id: acceptButton
                     text: "Accept"
                     visible: false
                     penColor: Style.lightGray

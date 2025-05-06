@@ -1,9 +1,9 @@
 #pragma once
-#include "sudoku/App.h"
 #include <QAbstractTableModel>
 #include <QByteArray>
 #include <QHash>
 #include <QVariant>
+#include <sudoku/App.h>
 
 namespace qt {
 

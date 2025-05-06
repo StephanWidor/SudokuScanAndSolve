@@ -1,45 +1,30 @@
 #pragma once
-#include "cv/recognition/sudoku.h"
-#include <QAbstractVideoFilter>
+#include <QVideoFrame>
+#include <QVideoSink>
 #include <atomic>
+#include <base/spin_mutex.h>
+#include <cv/recognition/sudoku.h>
 
 namespace qt {
 
-class ProcessingFilter;
-
-class ProcessingFilterRunnable : public QVideoFilterRunnable
-{
-public:
-    ProcessingFilterRunnable(ProcessingFilter &filter): QVideoFilterRunnable(), m_filter(filter) {}
-
-    QVideoFrame run(QVideoFrame *, const QVideoSurfaceFormat &, RunFlags) override;
-
-private:
-    ProcessingFilter &m_filter;
-};
-
-class ProcessingFilter : public QAbstractVideoFilter
+class ProcessingFilter : public QObject
 {
     Q_OBJECT
-
-    Q_PROPERTY(int cameraRotation READ cameraRotation WRITE setCameraRotation)
-    Q_PROPERTY(
-      bool outputProcessingImg READ outputProcessingImg WRITE outputProcessingImg NOTIFY outputProcessingImgChanged)
-
-    friend ProcessingFilterRunnable;
+    Q_PROPERTY(bool showProcessingImg READ showProcessingImg WRITE setShowProcessingImg NOTIFY showProcessingImgChanged)
 
 public:
-    ProcessingFilter(): QAbstractVideoFilter() {}
+    ProcessingFilter(QObject *parent = nullptr);
 
-    QVideoFilterRunnable *createFilterRunnable() override;
+    ~ProcessingFilter();
 
-    bool outputProcessingImg() const { return m_outputProcessingImg; }
-    void outputProcessingImg(bool doIt)
+    bool showProcessingImg() const { return m_showProcessingImg; }
+
+    void setShowProcessingImg(bool showProcessingImg)
     {
-        if (m_outputProcessingImg != doIt)
+        if (m_showProcessingImg != showProcessingImg)
         {
-            m_outputProcessingImg = doIt;
-            emit outputProcessingImgChanged();
+            m_showProcessingImg = showProcessingImg;
+            emit showProcessingImgChanged();
         }
     }
 
@@ -48,22 +33,60 @@ public:
     static constexpr size_t resultBufferSize = 10;
 
 public slots:
+    QVideoSink *videoSink() { return &m_inputSocket.sink; }
 
-    void processImg(const QUrl &url);
+    /// just setting pointer, no ownership!
+    void setOutputSink(QVideoSink *pSink) { m_outputSocket.setSink(pSink); }
+
+    bool startCameraThread();
+
+    void stopCameraThread();
+
+    void processSingleImg(const QUrl &url);
 
 signals:
     void processingFinished() const;
     void resultReady(bool success) const;
     void acceptScanResult() const;
-    void outputProcessingImgChanged() const;
+    void showProcessingImgChanged() const;
 
-protected:
-    void setCameraRotation(int rotation) { m_cameraRotation = rotation; }
-    int cameraRotation() const { return m_cameraRotation; }
+private:
+    void onInputFrame(const QVideoFrame &);
 
-    bool m_outputProcessingImg{true};
-    std::atomic<int> m_cameraRotation{0};
+    bool m_showProcessingImg{true};
     std::vector<cv::recognition::sudoku::Result> m_resultBuffer;
+
+    enum class State
+    {
+        Idle,
+        ThreadProcessing,
+        SingleProcessing,
+        ThreadShouldStop
+    };
+
+    std::atomic<State> m_state{State::Idle};
+
+    struct InputSocket
+    {
+        void push(const QVideoFrame &);
+        cv::Mat get();
+
+        QVideoSink sink;
+        QImage img;
+        bool newImgAvailable = false;
+        spin_mutex mutex;
+    };
+    InputSocket m_inputSocket;
+
+    struct OutputSocket
+    {
+        void setSink(QVideoSink *pNewSink);
+        void push(const cv::Mat &img);
+
+        spin_mutex mutex;
+        QVideoSink *pSink = nullptr;
+    };
+    OutputSocket m_outputSocket;
 };
 
 }    // namespace qt

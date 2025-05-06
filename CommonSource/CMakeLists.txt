@@ -7,12 +7,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 option(ENABLE_TESSERACT "" OFF)
 set(DEFAULT_TRAINDATADIR ${CMAKE_CURRENT_SOURCE_DIR}/../assets/TrainData)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../OpenCV ${CMAKE_CURRENT_BINARY_DIR}/OpenCV)
-
 set(HEADERS
     base/ExecutionHelp.h
     base/colors.h
     base/math.h
+    base/spin_mutex.h
     base/utils.h
     cv/contourUtils.h
     cv/imageUtils.h
@@ -55,23 +54,17 @@ if(ANDROID)
     add_compile_options(-fopenmp)
     add_link_options(-fopenmp -static-openmp)
 else()
-    find_package(OpenMP COMPONENTS CXX)
-    if(OpenMP_FOUND)
-        target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+    if(LINUX)
+        # libstdc++ uses tbb for parallel algorithms
+        find_package(TBB)
     endif()
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # gcc uses tbb for parallel algorithms
-    find_package(TBB)
-endif()
-
-if(TBB_FOUND)
-    message("linking to tbb for parallel execution in gcc build")
-    target_link_libraries(${PROJECT_NAME}
-       PUBLIC
-       TBB::tbb
-       )
+    if(TBB_FOUND)
+        message("linking to tbb for parallel execution in gcc build")
+        target_link_libraries(${PROJECT_NAME}
+           PUBLIC
+           TBB::tbb
+           )
+    endif()
 endif()
 
 if(ENABLE_TESSERACT)
