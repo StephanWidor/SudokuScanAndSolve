@@ -1,13 +1,8 @@
 #include "cv/recognition/digit.h"
-#include "base/ExecutionHelp.h"
-#include "cv/imageUtils.h"
 #include "cv/types.h"
 #include "cv/utils2d.h"
-#include <atomic>
-#include <exception>
-#include <execution>
+#include <base/utils.h>
 #include <filesystem>
-#include <iostream>
 #include <numeric>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/text/ocr.hpp>
@@ -230,8 +225,6 @@ cv::Mat preprocess(const cv::Mat &cellImg, bool blackOnWhite)
                 threshImg = 255 - threshImg;
             filteredImg = cv::Mat(threshImg.size(), CV_8UC1, blackOnWhite ? 255 : 0);
             threshImg(boundingRect).copyTo(filteredImg(boundingRect));
-            //            cv::resize(filteredImg, filteredImg, cv::Size(200, 200));
-            //            cv::showAndWait(filteredImg);
         }
     }
     return filteredImg;

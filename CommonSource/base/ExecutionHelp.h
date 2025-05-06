@@ -1,12 +1,14 @@
 #pragma once
 #include <algorithm>
 
-#undef emit    // Qt's emit clashes with TBB's
+#ifdef emit
+#undef emit    // Qt's emit define clashes with TBB's emit define
+#endif
 #include <execution>
 
 // Workaround for missing parallel execution on Android
 
-namespace execution_help {
+namespace par_execution_help {
 
 template<class _ForwardIterator, class _Pred>
 inline bool all_of(_ForwardIterator __first, _ForwardIterator __last, _Pred __pred)
@@ -47,4 +49,4 @@ inline ForwardIt3 transform(ForwardIt1 first1, ForwardIt1 last1, ForwardIt2 firs
 #endif
 }
 
-}    // namespace execution_help
+}    // namespace par_execution_help

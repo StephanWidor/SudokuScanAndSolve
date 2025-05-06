@@ -1,7 +1,6 @@
 #include "sudoku/solver.h"
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 
 namespace {
 

@@ -162,8 +162,8 @@ cv::Mat extractGridPointsImage(const cv::Mat &gridImg, bool doSobel)
 {
     std::array<cv::Mat, 2> lines;
     std::array<bool, 2> vertical{false, true};
-    execution_help::transform(vertical.begin(), vertical.end(), lines.begin(),
-                              [&](bool vertical) { return extractLinesImage(gridImg, vertical, doSobel); });
+    par_execution_help::transform(vertical.begin(), vertical.end(), lines.begin(),
+                                  [&](bool vertical) { return extractLinesImage(gridImg, vertical, doSobel); });
     if (!lines[0].empty() && !lines[1].empty())
     {
         cv::Mat gridPointsImg(gridImg.size(), CV_8UC1, cv::Scalar(0));
@@ -301,8 +301,8 @@ std::array<cv::Mat, 81> cellImages(const cv::Mat &img, const cv::ContourVector &
 {
     assert(cellContours.size() == 81);
     std::array<cv::Mat, 81> cellImages;
-    execution_help::transform(cellContours.begin(), cellContours.end(), cellImages.begin(),
-                              [&img](const auto &contour) { return cv::warpedContourInterior(img, contour); });
+    par_execution_help::transform(cellContours.begin(), cellContours.end(), cellImages.begin(),
+                                  [&img](const auto &contour) { return cv::warpedContourInterior(img, contour); });
     return cellImages;
 }
 
@@ -371,8 +371,8 @@ cv::recognition::sudoku::Result cv::recognition::sudoku::camFailResult()
     ::sudoku::Sheet sheet;
     if (doParallel)
     {
-        execution_help::transform(cellImages.begin(), cellImages.end(), sheet.begin(),
-                                  [&classifier](const auto &img) { return classifier.classify(img); });
+        par_execution_help::transform(cellImages.begin(), cellImages.end(), sheet.begin(),
+                                      [&classifier](const auto &img) { return classifier.classify(img); });
     }
     else
     {
@@ -391,7 +391,7 @@ sudoku::Sheet cv::recognition::sudoku::votedSheet(const std::vector<Result> &res
         return readSheet(results.back().cellImages, classifier, true);
 
     std::vector<::sudoku::Sheet> sheets(results.size() - offset);
-    execution_help::transform(
+    par_execution_help::transform(
       results.begin() + offset, results.end(), sheets.begin(),
       [&classifier](const sudoku::Result &result) { return readSheet(result.cellImages, classifier, false); });
 

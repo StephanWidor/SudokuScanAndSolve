@@ -1,6 +1,5 @@
 #include "cv/contourUtils.h"
 #include "base/ExecutionHelp.h"
-#include <execution>
 #include <numeric>
 #include <opencv2/imgproc.hpp>
 
@@ -17,7 +16,7 @@ bool cv::contourWithinCornerConnections(const cv::Contour &contour, const cv::Co
     };
     std::array<std::pair<cv::Line2d, double>, 4> connections = {connection(0), connection(1), connection(2),
                                                                 connection(3)};
-    return execution_help::all_of(contour.begin(), contour.end(), [&](const cv::Point &p) {
+    return par_execution_help::all_of(contour.begin(), contour.end(), [&](const cv::Point &p) {
         return std::all_of(connections.begin(), connections.end(), [&](const auto &connection) {
             double dist = cv::signedDist(connection.first, p);
             return dist <= connection.second;

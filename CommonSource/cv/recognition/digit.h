@@ -1,9 +1,6 @@
 #pragma once
-#include "base/utils.h"
-#include "sudoku/Sheet.h"
 #include <filesystem>
 #include <opencv2/core.hpp>
-#include <string_view>
 
 namespace cv::recognition::digit {
 
