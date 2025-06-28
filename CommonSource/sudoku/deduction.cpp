@@ -1,6 +1,7 @@
 #include "sudoku/deduction.h"
 #include "sudoku/IndexContainer.h"
 #include <cassert>
+#include <ranges>
 
 sudoku::deduction::Entries sudoku::deduction::entries(const sudoku::Sheet &sheet)
 {
@@ -24,19 +25,26 @@ void update(sudoku::deduction::SheetPossibleValues &io_possibleValues, bool cons
         const auto cellIndex = entry.cellIndex;
         const auto value = entry.value;
         auto &cellPossibleValues = io_possibleValues[cellIndex];
-        if (entry.action == sudoku::deduction::Entry::Set)
+        switch (entry.action)
         {
-            for (sudoku::Value v = 1; v < 10; ++v)
-                cellPossibleValues[v] &= (v == value);
-            for (auto container :
-                 sudoku::relevantContainers(sudoku::row(cellIndex), sudoku::col(cellIndex), considerDiagonals))
+            case sudoku::deduction::Entry::Set:
             {
-                for (auto otherCellIndex : *container)
-                    io_possibleValues[otherCellIndex][value] &= (otherCellIndex == cellIndex);
+                for (sudoku::Value v = 1; v < 10; ++v)
+                    cellPossibleValues[v] &= (v == value);
+                for (auto container :
+                     sudoku::relevantContainers(sudoku::row(cellIndex), sudoku::col(cellIndex), considerDiagonals))
+                {
+                    for (auto otherCellIndex : *container)
+                        io_possibleValues[otherCellIndex][value] &= (otherCellIndex == cellIndex);
+                }
+                break;
+            }
+            case sudoku::deduction::Entry::Forbid:
+            {
+                cellPossibleValues[value] = false;
+                break;
             }
         }
-        else
-            cellPossibleValues[value] = false;
     }
 }
 
@@ -61,19 +69,22 @@ bool appendSetAction(const sudoku::Sheet &currentSheet, sudoku::deduction::Entri
 {
     if (currentSheet[cellIndex] != 0)
         return (currentSheet[cellIndex] == value);
+
     bool found = false;
-    for (auto &entry : entries)
+    for (auto &entry :
+         entries | std::ranges::views::filter([&](const auto &entry) { return entry.cellIndex == cellIndex; }))
     {
-        if (entry.cellIndex == cellIndex)
+        switch (entry.action)
         {
-            if (entry.action == sudoku::deduction::Entry::Set)
+            case sudoku::deduction::Entry::Set:
             {
                 if (entry.value == value)
                     found = true;
                 else
                     return false;
+                break;
             }
-            else
+            case sudoku::deduction::Entry::Forbid:
             {
                 if (entry.value == value)
                     return false;
@@ -83,6 +94,7 @@ bool appendSetAction(const sudoku::Sheet &currentSheet, sudoku::deduction::Entri
                     entry.value = value;
                     found = true;
                 }
+                break;
             }
         }
     }
