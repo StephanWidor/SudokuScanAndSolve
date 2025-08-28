@@ -4,7 +4,7 @@ set -e
 export ANDROID_ABI=arm64-v8a # arm64-v8a armeabi-v7a x86 x86_64
 export NDK_PATH=/opt/android-sdk/ndk/29.0.13113456
 export NDK_BIN_PATH=$NDK_PATH/toolchains/llvm/prebuilt/linux-x86_64/bin
-export QT_PATH=/opt/Qt/6.9.0
+export QT_PATH=/opt/Qt/6.9.2
 export QT_HOST_PATH=$QT_PATH/gcc_64
 export SDK_PATH=/opt/android-sdk
 export JDK_PATH=/opt/android-studio/jbr
