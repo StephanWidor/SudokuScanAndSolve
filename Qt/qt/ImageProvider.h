@@ -4,10 +4,10 @@
 
 namespace qt {
 
-class ResultImageProvider : public QQuickImageProvider
+class ImageProvider : public QQuickImageProvider
 {
 public:
-    ResultImageProvider(): QQuickImageProvider(QQmlImageProviderBase::Image) {}
+    ImageProvider(): QQuickImageProvider(QQmlImageProviderBase::Image) {}
 
     QImage requestImage(const QString &, QSize *size, const QSize &requestedSize) override;
 

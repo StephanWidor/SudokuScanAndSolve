@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import "Custom" as Custom
-import stephanwidor.SudokuScanAndSolve 1.0
+import stephanwidor.SudokuScanAndSolve 1.1
 
 Custom.Page {
     id: licensesView
@@ -27,7 +27,7 @@ Third party software that is used is mentioned on this page.
                 topPadding: 20
                 color: Style.lightGray
                 font.bold: true
-                text: "Qt 5.15.2"
+                text: "Qt 6"
             }
             Custom.RichText {
                 Layout.fillWidth: true
@@ -52,7 +52,7 @@ There is different licenses for Qt. As this app is open source, we can use the \
                 wrapMode: Text.WordWrap
                 textFormat: Text.RichText
                 text: "
-OpenCV is licensed under <a href='https://github.com/opencv/opencv/blob/4.8.0/LICENSE'>Apache License 2.0</a>.
+OpenCV is licensed under <a href='https://github.com/opencv/opencv/blob/4.11.0/LICENSE'>Apache License 2.0</a>.
 "
             }
             Label {

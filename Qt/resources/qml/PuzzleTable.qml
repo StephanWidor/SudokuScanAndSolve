@@ -1,7 +1,7 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import stephanwidor.SudokuScanAndSolve 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import stephanwidor.SudokuScanAndSolve 1.1
 
 Rectangle {
     id: puzzleTable
@@ -22,7 +22,7 @@ Rectangle {
         onSizeChanged: layoutCount = 0
         property int layoutCount: 0
         onLayoutCountChanged: {
-            if(layoutCount == 81)
+            if (layoutCount == 81)
                 forceLayout()
         }
         width: size
@@ -34,10 +34,10 @@ Rectangle {
         delegate: PuzzleRect {
             id: cell
             rectAnchors {
-                topMargin: model.row % 3 == 0? tableView.borderExtra : 0
-                leftMargin: model.column % 3 == 0? tableView.borderExtra : 0
-                bottomMargin: model.row % 3 == 2? tableView.borderExtra : 0
-                rightMargin: model.column % 3 == 2? tableView.borderExtra : 0
+                topMargin: model.row % 3 == 0 ? tableView.borderExtra : 0
+                leftMargin: model.column % 3 == 0 ? tableView.borderExtra : 0
+                bottomMargin: model.row % 3 == 2 ? tableView.borderExtra : 0
+                rightMargin: model.column % 3 == 2 ? tableView.borderExtra : 0
             }
             implicitWidth: tableView.cellSize
             implicitHeight: tableView.cellSize

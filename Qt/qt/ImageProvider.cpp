@@ -1,7 +1,8 @@
 #include "qt/ImageProvider.h"
-#include <opencv2/imgproc.hpp>
 
-QImage qt::ResultImageProvider::requestImage(const QString &, QSize *size, const QSize &requestedSize)
+namespace qt {
+
+QImage qt::ImageProvider::requestImage(const QString &, QSize *size, const QSize &requestedSize)
 {
     if (!requestedSize.isEmpty())
         cv::resize(m_img, m_img, cv::Size(requestedSize.width(), requestedSize.height()), 0, 0, cv::INTER_AREA);
@@ -11,3 +12,5 @@ QImage qt::ResultImageProvider::requestImage(const QString &, QSize *size, const
         return QImage(m_img.data, m_img.cols, m_img.rows, static_cast<int>(m_img.step), QImage::Format_Grayscale8);
     return QImage(m_img.data, m_img.cols, m_img.rows, static_cast<int>(m_img.step), QImage::Format_BGR888);
 }
+
+}    // namespace qt

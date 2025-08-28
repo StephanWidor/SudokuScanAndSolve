@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 import "Custom" as Custom
-import stephanwidor.SudokuScanAndSolve 1.0
+import stephanwidor.SudokuScanAndSolve 1.1
 
 Rectangle {
     id: puzzleView
@@ -36,7 +36,7 @@ Rectangle {
         PuzzleTable {
             id: puzzleTable
             Layout.alignment: Qt.AlignHCenter
-            size: Math.min(mainLayout.width, mainLayout.height - 5 * scanButton.height)
+            size: Math.min(mainLayout.width, mainLayout.height / 14 * 9)
         }
 
         Item {
@@ -46,6 +46,7 @@ Rectangle {
 
         NumberEdit {
             id: numberEdit
+            buttonSize: puzzleTable.size / 10
             Layout.alignment: Qt.AlignHCenter
         }
 
@@ -57,24 +58,29 @@ Rectangle {
         RowLayout {
             id: globalButtons
             Layout.alignment: Qt.AlignHCenter
+            property int buttonWidth: puzzleTable.size / 5
             Custom.Button {
                 id: scanButton
                 text: "Scan"
+                implicitWidth: globalButtons.buttonWidth
                 onClicked: scanningView.open()
             }
             Custom.Button {
                 id: createButton
                 text: "Create"
+                implicitWidth: globalButtons.buttonWidth
                 onClicked: puzzle.createPuzzle()
             }
             Custom.Button {
                 id: clearAllButton
                 text: "Clear All"
+                implicitWidth: globalButtons.buttonWidth
                 onClicked: puzzle.clearPuzzle()
             }
             Custom.Button {
                 id: solveAllButton
                 text: "Solve All"
+                implicitWidth: globalButtons.buttonWidth
                 onClicked: puzzle.solvePuzzle()
             }
         }

@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 import "Custom" as Custom
-import stephanwidor.SudokuScanAndSolve 1.0
+import stephanwidor.SudokuScanAndSolve 1.1
 
 ColumnLayout {
     id: numberEdit
@@ -12,11 +12,10 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         Repeater {
             model: ["1", "2", "3", "4", "5", "6"]
-            Custom.Button {
+            NumberEditButton {
                 id: numberButton0
                 text: modelData
-                implicitWidth: numberEdit.buttonSize
-                implicitHeight: numberEdit.buttonSize
+                rectSize: numberEdit.buttonSize
                 onClicked: puzzle.selectValue(index + 1)
                 Shortcut {
                     sequence: modelData
@@ -30,11 +29,10 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         Repeater {
             model: ["7", "8", "9"]
-            Custom.Button {
+            NumberEditButton {
                 id: numberButton1
                 text: modelData
-                implicitWidth: numberEdit.buttonSize
-                implicitHeight: numberEdit.buttonSize
+                rectSize: numberEdit.buttonSize
                 onClicked: puzzle.selectValue(index + 7)
                 Shortcut {
                     sequence: modelData
@@ -42,33 +40,33 @@ ColumnLayout {
                 }
             }
         }
-        Custom.MaterialFontButton {
+        NumberEditButton {
             id: clearSelectedButton
+            font.family: "Material Icons Outlined"
             text: "\ue256"
-            implicitWidth: numberEdit.buttonSize
-            implicitHeight: numberEdit.buttonSize
+            rectSize: numberEdit.buttonSize
             onClicked: puzzle.clearSelected()
             Custom.ToolTip {
                 text: "Clear selected Cell(s)"
                 control: clearSelectedButton
             }
         }
-        Custom.MaterialFontButton {
+        NumberEditButton {
             id: solveSelectedButton
+            font.family: "Material Icons Outlined"
             text: "\ue8f4"
-            implicitWidth: numberEdit.buttonSize
-            implicitHeight: numberEdit.buttonSize
+            rectSize: numberEdit.buttonSize
             onClicked: puzzle.solveSelected()
             Custom.ToolTip {
                 text: "Solve selected Cell(s)"
                 control: solveSelectedButton
             }
         }
-        Custom.MaterialFontButton {
+        NumberEditButton {
             id: undoButton
+            font.family: "Material Icons Outlined"
             text: "\ue166"
-            implicitWidth: numberEdit.buttonSize
-            implicitHeight: numberEdit.buttonSize
+            rectSize: numberEdit.buttonSize
             visible: puzzle.hasHistory
             onClicked: puzzle.undo()
             Custom.ToolTip {

@@ -1,26 +1,15 @@
 #pragma once
-#include <QObject>
 #include <filesystem>
 
 namespace qt {
 
-class FileSystem : public QObject
+std::filesystem::path appDataDir();
+
+inline std::filesystem::path stateFilePath()
 {
-    Q_OBJECT
-public:
-    FileSystem(QObject *parent = nullptr): QObject(parent) {}
+    return appDataDir() / "state.yaml";
+}
 
-    enum class AccessType
-    {
-        Read,
-        Write
-    };
-    Q_ENUM(AccessType)
-
-    static std::filesystem::path appDataDir();
-
-public slots:
-    static bool requestPermission(AccessType);
-};
+const std::filesystem::path &provideTrainDataDir();
 
 }    // namespace qt

@@ -1,9 +1,9 @@
 #pragma once
 #include "sudoku/History.h"
-#include "sudoku/IndexContainer.h"
 #include "sudoku/Sheet.h"
 #include "sudoku/solver.h"
 #include <filesystem>
+#include <functional>
 #include <optional>
 #include <variant>
 

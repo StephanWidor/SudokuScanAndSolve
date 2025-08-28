@@ -1,11 +1,11 @@
 #pragma once
-#include "sudoku/Sheet.h"
 #include <chrono>
 #include <filesystem>
 #include <iomanip>
 #include <opencv2/core.hpp>
 #include <sstream>
 #include <string>
+#include <sudoku/Sheet.h>
 
 namespace test::utils {
 

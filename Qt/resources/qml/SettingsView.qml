@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import "Custom" as Custom
-import stephanwidor.SudokuScanAndSolve 1.0
+import stephanwidor.SudokuScanAndSolve 1.1
 
 Custom.Page {
     id: settingsView
@@ -73,8 +73,8 @@ Custom.Page {
             }
             Custom.CheckBox {
                 penColor: Style.lightGray
-                checked: !processingFilter.outputProcessingImg
-                onClicked: processingFilter.outputProcessingImg = !checked
+                checked: !processingFilter.showProcessingImg
+                onClicked: processingFilter.showProcessingImg = !checked
             }
         }
         Item {

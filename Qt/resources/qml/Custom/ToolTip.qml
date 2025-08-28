@@ -1,6 +1,6 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
-import stephanwidor.SudokuScanAndSolve 1.0
+import QtQuick
+import QtQuick.Controls as Controls
+import stephanwidor.SudokuScanAndSolve 1.1
 
 Controls.ToolTip {
     property var control
@@ -14,11 +14,11 @@ Controls.ToolTip {
     contentItem: Text {
         text: toolTip.text
         font: toolTip.font
-        color: dark? Style.lightGray : Style.darkGray
+        color: dark ? Style.lightGray : Style.darkGray
     }
 
     background: Rectangle {
-        color: dark? Style.darkGray : Style.lightGray
+        color: dark ? Style.darkGray : Style.lightGray
         radius: toolTip.height / 10
     }
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include <array>
-#include <functional>
-#include <tuple>
+#include <stddef.h>
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)

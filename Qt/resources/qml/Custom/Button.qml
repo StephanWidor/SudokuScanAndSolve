@@ -1,6 +1,6 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
-import stephanwidor.SudokuScanAndSolve 1.0
+import QtQuick
+import QtQuick.Controls as Controls
+import stephanwidor.SudokuScanAndSolve 1.1
 
 Controls.Button {
     id: control
@@ -9,20 +9,21 @@ Controls.Button {
     property bool round: false
 
     contentItem: Text {
+        anchors.fill: parent
         text: control.text
         font: control.font
         opacity: enabled ? 1.0 : 0.3
-        color: control.down? Style.lightGray : penColor
+        color: control.down ? Style.lightGray : penColor
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        elide: Text.ElideRight
     }
 
     background: Rectangle {
+        anchors.fill: parent
         opacity: enabled ? 1 : 0.3
-        color: control.down? Style.orange : Style.transparent
+        color: control.down ? Style.orange : Style.transparent
         border.color: control.penColor
-        border.width: drawBorder? 2 : 0
-        radius: round? control.height / 2 : control.height / 10
+        border.width: drawBorder ? 2 : 0
+        radius: round ? control.height / 2 : control.height / 10
     }
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "sudoku/Sheet.h"
+#include <functional>
 #include <vector>
 
 namespace sudoku {
