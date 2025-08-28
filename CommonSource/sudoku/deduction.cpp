@@ -160,10 +160,11 @@ bool sudoku::deduction::Data::update(Entries newEntries)
 {
     while (!newEntries.empty())
     {
-        for (const auto &entry : newEntries)
+        for (auto &entry : newEntries | std::ranges::views::filter([&](const auto &entry) {
+                               return entry.action == sudoku::deduction::Entry::Set;
+                           }))
         {
-            if (entry.action == sudoku::deduction::Entry::Set)
-                m_sheet[entry.cellIndex] = entry.value;
+            m_sheet[entry.cellIndex] = entry.value;
         }
         ::update(m_possibleValues, m_considerDiagonals, newEntries);
         ::update(m_possibleValues, m_possiblePositions, m_considerDiagonals);
